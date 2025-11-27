@@ -27,7 +27,7 @@ class ProductController extends Controller
 
         return redirect()
                 ->route('products.show', [$product]) // vai ['product' => $product]
-                ->with('message', "Product created successfully");
+                ->with('status', "Product created successfully");
     }
 
     public function show(Product $product) {
@@ -38,7 +38,7 @@ class ProductController extends Controller
         $product->delete();
         return redirect()
                 ->route('products.index')
-                ->with('message', "Product deleted successfully");
+                ->with('status', "Product deleted successfully");
     }
 
     public function edit(Product $product) {
@@ -56,7 +56,7 @@ class ProductController extends Controller
         $product->update($validated);
         return redirect()
                 ->route('products.show', [$product])
-                ->with('message', "Product updated successfully");
+                ->with('status', "Product updated successfully");
     }
 
     public function decreaseQuantity(Request $request, Product $product) {
@@ -67,7 +67,7 @@ class ProductController extends Controller
         if ($product->decreaseQuantity($request->amount)) {
             return redirect()
                     ->route('products.show', [$product])
-                    ->with('message', "Product quantity decreased successfully");
+                    ->with('status', "Product quantity decreased successfully");
         } else {
             return redirect()
                     ->route('products.show', [$product])
