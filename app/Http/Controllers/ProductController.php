@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Tag;
 
 class ProductController extends Controller
 {
@@ -21,9 +22,19 @@ class ProductController extends Controller
             'name' => 'required|unique:products|max:255',
             'quantity' => 'required|integer',
             'description' => 'required',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
         ]);
 
         $product = Product::create($validated);
+
+          if (!empty($validated['tags'])) {
+            $tags = [];
+            foreach ($validated['tags'] as $tagName) {
+                $tags[] = Tag::firstOrCreate(['name' => $tagName])->id;
+            }
+            $product->tags()->sync($tags);
+        }
 
         return redirect()
                 ->route('products.show', [$product]) // vai ['product' => $product]
@@ -31,6 +42,7 @@ class ProductController extends Controller
     }
 
     public function show(Product $product) {
+        $product->load('tags');
         return view('products.show', compact('product'));
     }
 
@@ -42,18 +54,28 @@ class ProductController extends Controller
     }
 
     public function edit(Product $product) {
+        $product->load('tags');
         return view('products.edit', compact('product'));
     }
 
     public function update(Request $request, Product $product) {
-        
+
         $validated = $request->validate([
             'name' => 'required|max:255',
             'quantity' => 'required|integer',
             'description' => 'required',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
         ]);
 
         $product->update($validated);
+         $tags = [];
+        if (!empty($validated['tags'])) {
+            foreach ($validated['tags'] as $tagName) {
+                $tags[] = Tag::firstOrCreate(['name' => $tagName])->id;
+            }
+        }
+        $product->tags()->sync($tags);
         return redirect()
                 ->route('products.show', [$product])
                 ->with('status', "Product updated successfully");
@@ -94,4 +116,19 @@ class ProductController extends Controller
                 ->route('products.show', [$product]) // vai ['product' => $product]
                 ->with('status', "Product created successfully");
     }
+
+     public function updateTags(Request $request, Product $product)
+{
+    $request->validate([
+        'tags.*' => 'string|max:255',
+    ]);
+
+    $tags = collect($request->tags)->map(function($tagName) {
+        return Tag::firstOrCreate(['name' => $tagName])->id;
+    });
+
+    $product->tags()->sync($tags);
+
+    return redirect()->back()->with('success', 'Tags updated!');
+}
 }

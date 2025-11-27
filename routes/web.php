@@ -14,3 +14,5 @@ Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name
 Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
 Route::patch('/products/{product}/up', [ProductController::class, 'increseQuantity'])->name('products.up');
 Route::patch('/products/{product}/down', [ProductController::class, 'decreaseQuantity'])->name('products.down');
+Route::patch('/products/{product}/add-tag', [ProductController::class, 'addTag'])->name('products.addTag');
+Route::put('/products/{product}/update-tags', [ProductController::class, 'updateTags'])->name('products.updateTags');
