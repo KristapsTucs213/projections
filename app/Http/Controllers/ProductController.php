@@ -18,27 +18,24 @@ class ProductController extends Controller
     }
 
     public function store(Request $request) {
-        $validated = $request->validate([
-            'name' => 'required|unique:products|max:255',
-            'quantity' => 'required|integer',
-            'description' => 'required',
-            'tags' => 'nullable|array',
-            'tags.*' => 'string',
-        ]);
+       $validated = $request->validate([
+        'name' => 'required|max:255',
+        'quantity' => 'required|integer',
+        'description' => 'required',
+        'tags' => 'nullable|string',
+    ]);
 
         $product = Product::create($validated);
 
-          if (!empty($validated['tags'])) {
-            $tags = [];
-            foreach ($validated['tags'] as $tagName) {
-                $tags[] = Tag::firstOrCreate(['name' => $tagName])->id;
-            }
-            $product->tags()->sync($tags);
-        }
+        $tagNames = $this->parseTags($request->tags);
+
+        $tagIds = $this->syncTags($tagNames);
+
+        $product->tags()->sync($tagIds);
 
         return redirect()
-                ->route('products.show', [$product]) // vai ['product' => $product]
-                ->with('status', "Product created successfully");
+                 ->route('products.show', $product)
+            ->with('status', "Product created successfully");
     }
 
     public function show(Product $product) {
@@ -61,24 +58,43 @@ class ProductController extends Controller
     public function update(Request $request, Product $product) {
 
         $validated = $request->validate([
-            'name' => 'required|max:255',
-            'quantity' => 'required|integer',
-            'description' => 'required',
-            'tags' => 'nullable|array',
-            'tags.*' => 'string',
-        ]);
+        'name' => 'required|max:255',
+        'quantity' => 'required|integer',
+        'description' => 'required',
+        'tags' => 'nullable|string',
+    ]);
 
         $product->update($validated);
-         $tags = [];
-        if (!empty($validated['tags'])) {
-            foreach ($validated['tags'] as $tagName) {
-                $tags[] = Tag::firstOrCreate(['name' => $tagName])->id;
-            }
-        }
-        $product->tags()->sync($tags);
+        $product->update($validated);
+
+        $tagNames = $this->parseTags($request->tags);
+
+        $tagIds = $this->syncTags($tagNames);
+
+        $product->tags()->sync($tagIds);
+
         return redirect()
-                ->route('products.show', [$product])
-                ->with('status', "Product updated successfully");
+            ->route('products.show', $product)
+            ->with('status', "Product updated successfully");
+    }
+
+    private function parseTags($string)
+    {
+        if (!$string) {
+            return [];
+        }
+        return array_filter(array_map('trim', explode(',', $string)));
+    }
+
+    private function syncTags($tagNames)
+    {
+        $tagIds = [];
+
+        foreach ($tagNames as $name) {
+            $tagIds[] = Tag::firstOrCreate(['name' => $name])->id;
+        }
+
+        return $tagIds;
     }
 
     public function decreaseQuantity(Request $request, Product $product) {
@@ -117,18 +133,16 @@ class ProductController extends Controller
                 ->with('status', "Product created successfully");
     }
 
-     public function updateTags(Request $request, Product $product)
-{
-    $request->validate([
-        'tags.*' => 'string|max:255',
-    ]);
+    public function updateTags(Request $request, Product $product)
+    {
+        $request->validate([
+            'tags.*' => 'string|max:255',
+        ]);
 
-    $tags = collect($request->tags)->map(function($tagName) {
-        return Tag::firstOrCreate(['name' => $tagName])->id;
-    });
-
-    $product->tags()->sync($tags);
-
-    return redirect()->back()->with('success', 'Tags updated!');
-}
+        $tags = collect($request->tags)->map(function($tagName) {
+            return Tag::firstOrCreate(['name' => $tagName])->id;
+        });
+        $product->tags()->sync($tags);
+        return redirect()->back()->with('success', 'Tags updated!');
+    }
 }
