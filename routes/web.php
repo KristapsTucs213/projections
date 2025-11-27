@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TagController;
 
 Route::redirect('/', '/products');
 
@@ -16,3 +17,4 @@ Route::patch('/products/{product}/up', [ProductController::class, 'increseQuanti
 Route::patch('/products/{product}/down', [ProductController::class, 'decreaseQuantity'])->name('products.down');
 Route::patch('/products/{product}/add-tag', [ProductController::class, 'addTag'])->name('products.addTag');
 Route::put('/products/{product}/update-tags', [ProductController::class, 'updateTags'])->name('products.updateTags');
+Route::get('/tags/search', [TagController::class, 'search'])->name('tags.search');
