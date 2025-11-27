@@ -64,14 +64,34 @@ class ProductController extends Controller
             'amount' => 'required|integer|min:1',
         ]);
 
-        if ($product->decreaseQuantity($request->amount)) {
+        $amount = $request->input('amount');
+
+        $lol = $product->quantity -= $amount;
+        if ($lol < 0) {
             return redirect()
-                    ->route('products.show', [$product])
-                    ->with('status', "Product quantity decreased successfully");
+                ->route('products.show', [$product])
+                ->withErrors(['amount' => 'Not enough stock to decrease quantity.']);
         } else {
-            return redirect()
-                    ->route('products.show', [$product])
-                    ->withErrors(['amount' => 'Not enough stock to decrease quantity.']);
+            $product->save();
+           return redirect()
+                ->route('products.show', [$product]) // vai ['product' => $product]
+                ->with('status', "Product created successfully"); 
         }
+        
+    }
+
+    public function increseQuantity(Request $request, Product $product){
+        $request->validate([
+            'amount' => 'required|integer|min:1',
+        ]);
+
+        $amount = $request->input('amount');
+
+        $product->quantity += $amount;
+        $product->save();
+
+        return redirect()
+                ->route('products.show', [$product]) // vai ['product' => $product]
+                ->with('status', "Product created successfully");
     }
 }
