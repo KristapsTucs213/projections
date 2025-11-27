@@ -20,6 +20,8 @@
         <input type="text" name="name" value="{{ $product->name }}">
         <input type="number" name="quantity" value="{{ $product->quantity }}">
         <textarea name="description">{{ $product->description }}</textarea>
+          <label>Tags (comma separated):</label>
+        <input type="text" name="tags" value="{{ $product->tags->pluck('name')->implode(', ') }}">
         <input type="submit" value="Submit">
     </form>
 </x-layout>

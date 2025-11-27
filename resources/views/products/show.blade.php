@@ -15,6 +15,13 @@
 
     <h1>{{ $product->name }}</h1>
 
+    <h3>Tags:</h3>
+    <ul>
+        @foreach ($product->tags as $tag)
+            <li>{{ $tag->name }}</li>
+        @endforeach
+    </ul>
+
 
 
     <form action="{{ route('products.up', $product) }}" method="post">
@@ -24,7 +31,7 @@
         <input type="submit" value="done">
     </form>
 
-    
+
     <h4>Quantity: {{ $product->quantity }}</h4>
 
     <form action="{{ route('products.down', $product) }}" method="post">
