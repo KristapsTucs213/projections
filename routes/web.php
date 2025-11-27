@@ -12,3 +12,7 @@ Route::get('/products/{product}/show', [ProductController::class, 'show'])->name
 Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
 Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+
+Route::patch('/products/{product}/add-tag', [ProductController::class, 'addTag'])->name('products.addTag');
+
+Route::put('/products/{product}/update-tags', [ProductController::class, 'updateTags'])->name('products.updateTags');
