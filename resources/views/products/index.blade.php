@@ -14,7 +14,7 @@
                     <form action="{{ route('products.destroy', [$product]) }}" method="post">
                         @csrf
                         @method('DELETE')
-                        <input type="submit" value="Delete" class="btn btn-delete">
+                        <input type="submit" value="destroy" class="btn btn-delete">
                     </form>
                 </div>
             </li>

@@ -15,11 +15,10 @@
 
     <form action="{{ route('products.store') }}" method="post">
         @csrf
-        @method('PATCH')
-
         <input type="text" name="name" value="{{ old('name') }}" placeholder="Product name">
         <input type="number" name="quantity" value="{{ old('quantity') }}" placeholder="Quantity">
-        <textarea name="content" placeholder="Product description">{{ old('description') }}</textarea>
+        <input type="text" name="description" value="{{ old('description') }}" placeholder="description">
+        <!-- <textarea name="content" placeholder="Product description">{{ old('description') }}</textarea> -->
         <input type="submit" value="Submit">
     </form>
 </x-layout>

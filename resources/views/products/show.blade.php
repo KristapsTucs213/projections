@@ -17,7 +17,7 @@
     <h4>Quantity: {{ $product->quantity }}</h4>
     <p>{{ $product->description }}</p>
 
-    <a href="{{ route('products.edit', $product) }}">Edit</a>
+    <a href="{{ route('products.edit', [$product]) }}">Edit</a>
     <form action="{{ route('products.destroy', $product) }}" method="post">
         @csrf
         @method('DELETE')
