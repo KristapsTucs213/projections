@@ -24,24 +24,30 @@
 
 
 
-    <form action="{{ route('products.up', $product) }}" method="post">
+    <!-- <form action="{{ route('products.up', $product) }}" method="post">
         @csrf
         @method('patch')
         <input type="number" name="amount" value="+">
         <input type="submit" value="done">
-    </form>
+    </form> -->
 
 
-    <h4>Quantity: {{ $product->quantity }}</h4>
+    <h4 id="quantity">Quantity: {{ $product->quantity }}</h4>
 
-    <form action="{{ route('products.down', $product) }}" method="post">
+
+    <!-- <form action="{{ route('products.down', $product) }}" method="post">
         @csrf
         @method('patch')
         <input type="number" name="amount" value="-">
         <input type="submit" value="done">
-    </form>
+    </form> -->
 
+     
+    <input type="number" id="increaseAmount" min="1">
+    <button id="increaseBtn">Increase</button>
 
+    <input type="number" id="decreaseAmount" min="1">
+    <button id="decreaseBtn">Decrease</button>
 
 
 
@@ -53,4 +59,49 @@
         @method('DELETE')
         <input type="submit" value="Delete">
     </form>
+    
+    <div id="error" style="color: red; margin-top: 10px;"></div>
+
+    <script>
+        const increaseBtn = document.getElementById('increaseBtn');
+        const decreaseBtn = document.getElementById('decreaseBtn');
+        const quantitySpan = document.getElementById('quantity');
+        const errorDiv = document.getElementById('error');
+
+        async function sendUpdate(url, amount) {
+            errorDiv.textContent = ""; 
+
+            let res = await fetch(url, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ amount })
+            });
+
+            let data = await res.json();
+
+            if (res.ok) {
+                quantitySpan.textContent = data.quantity;
+            } else {
+                if (data.errors?.amount) {
+                    errorDiv.textContent = data.errors.amount[0];
+                } else {
+                    errorDiv.textContent = "An error occurred.";
+                }
+            }
+        }
+
+        increaseBtn.addEventListener("click", () => {
+            const amount = parseInt(document.getElementById('increaseAmount').value);
+            sendUpdate("{{ route('products.up', $product) }}", amount);
+        });
+
+        decreaseBtn.addEventListener("click", () => {
+            const amount = parseInt(document.getElementById('decreaseAmount').value);
+            sendUpdate("{{ route('products.down', $product) }}", amount);
+        });
+    </script>
+
 </x-layout>

@@ -90,15 +90,15 @@ class ProductController extends Controller
 
         $lol = $product->quantity -= $amount;
         if ($lol < 0) {
-            return redirect()
-                ->route('products.show', [$product])
-                ->withErrors(['amount' => 'Not enough stock to decrease quantity.']);
+            return response()->json([
+            'errors' => ['amount' => ['Not enough stock to decrease quantity.']]
+        ], 422);
         } else {
             $product->save();
-           return redirect()
-                ->route('products.show', [$product]) // vai ['product' => $product]
-                ->with('status', "Product created successfully");
-        }
+           return response()->json([
+        'quantity' => $product->quantity
+    ]);
+}
 
     }
 
@@ -112,9 +112,9 @@ class ProductController extends Controller
         $product->quantity += $amount;
         $product->save();
 
-        return redirect()
-                ->route('products.show', [$product]) // vai ['product' => $product]
-                ->with('status', "Product created successfully");
+        return response()->json([
+        'quantity' => $product->quantity
+    ]);
     }
 
      public function updateTags(Request $request, Product $product)
